@@ -73,8 +73,12 @@ rti_check.ensemble_event += self.ens_handler
 rti_check.select_and_process()
 
 # Then display data
+# Plot heatmap
 self.heatmap.get_plot("mag")
 self.heatmap.get_plot("dir")
+
+# Plot mag and direction line plot
+self.mag_dir_line.get_bin_selector()
 self.mag_dir_line.get_plot("mag")
 self.mag_dir_line.get_plot("dir")
 
