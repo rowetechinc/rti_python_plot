@@ -1,0 +1,4 @@
+rti_python_plot ChangeLog
+
+rti_python_plot - 1.0.0
+ - Initialize
