@@ -114,6 +114,21 @@ class StreamlitMagDirLine:
         st.subheader(plot_title)
 
         sel_bin_data = data.loc[data["bin_num"] == self.selected_bins[0]]
-        min_data = sel_bin_data.drop(columns=["type", "ss_code", "ss_config", "beam", "bin_num", "dt"])
+        #min_data = sel_bin_data.drop(columns=["type", "ss_code", "ss_config", "beam", "bin_num", "dt"])
 
-        st.line_chart(min_data)
+        dates = sel_bin_data['dt']
+        vals = sel_bin_data['val']
+
+        # Create the Bottom Track Range Line
+        line_plot = go.Scatter(
+            x=dates,
+            y=vals
+        )
+
+        plots = [line_plot]
+
+        fig = go.Figure(data=plots)
+
+        st.plotly_chart(fig)
+
+        #st.line_chart(min_data)

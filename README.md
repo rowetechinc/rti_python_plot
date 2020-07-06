@@ -1,8 +1,9 @@
 # Installation
-Install the required libraries.
+Install the required libraries and clone rti_python in the same project.
 
 ```commandline
 pip install -r requirements.txt
+pip install -r rti_python\requirements.txt
 ```
 
 # Reading in Data From File

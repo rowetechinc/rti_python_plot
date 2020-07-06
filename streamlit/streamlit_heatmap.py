@@ -19,6 +19,9 @@ class StreamlitHeatmap:
         self.prev_bt_north = 0.0
         self.prev_bt_vertical = 0.0
 
+        self.bin_size = 0.0
+        self.blank = 0
+
         self.is_upward_looking = False
 
     def add_ens(self, ens):
@@ -41,9 +44,22 @@ class StreamlitHeatmap:
                 self.prev_bt_east = ens.BottomTrack.EarthVelocity[0]
                 self.prev_bt_north = ens.BottomTrack.EarthVelocity[1]
                 self.prev_bt_vertical = ens.BottomTrack.EarthVelocity[2]
+                df_bt = ens.BottomTrack.encode_df(ens.EnsembleData.datetime(),
+                                                       ens.EnsembleData.SysFirmwareSubsystemCode,
+                                                       ens.EnsembleData.SubsystemConfig)
+
+                # Merge the data to the global buffer
+                if self.df_all_earth.empty:
+                    self.df_all_earth = df_bt
+                else:
+                    #df_all_earth.append(df_earth, ignore_index=True, sort=False)
+                    self.df_all_earth = pd.concat([self.df_all_earth, df_bt])
 
             # Create Dataframe
             if ens.IsAncillaryData and ens.IsEnsembleData:
+                self.blank = ens.AncillaryData.FirstBinRange
+                self.bin_size = ens.AncillaryData.BinSize
+
                 df_earth = ens.EarthVelocity.encode_df(ens.EnsembleData.datetime(),
                                                        ens.EnsembleData.SysFirmwareSubsystemCode,
                                                        ens.EnsembleData.SubsystemConfig,
@@ -77,9 +93,16 @@ class StreamlitHeatmap:
     @st.cache
     def get_dir_data(self):
         """
-        Get the Water Velocity Magnitude data from the global dataframe.
+        Get the Water Direction data from the global dataframe.
         """
         return self.df_all_earth.loc[self.df_all_earth['type'] == "Direction"]
+
+    @st.cache
+    def get_avg_range_data(self):
+        """
+        Get the Average Range data from the global dataframe.
+        """
+        return self.df_all_earth.loc[self.df_all_earth['type'] == "BT_Avg_Range"]
 
     def get_plot(self, plot_type:str="mag"):
         """
@@ -94,18 +117,36 @@ class StreamlitHeatmap:
             data = self.get_mag_data()
             plot_title = "Water Velocity Magnitude"
 
+        # Get the bottom range values
+        bt_range = self.get_avg_range_data()
+
         st.subheader("Heatmap")
         bin_nums = data['bin_num']
+        bin_depth = (data['bin_num'] * self.bin_size) + self.blank
         dates = data['dt']
         z = data['val']
 
         st.write(data)
+        st.write(bt_range)
+        #st.write(bin_nums)
+        #st.write(bin_depth)
 
-        fig = go.Figure(data=go.Heatmap(
+        # Create the heatmap
+        heatmap = go.Heatmap(
             z=z,
             x=dates,
-            y=bin_nums,
-            colorscale='Viridis'))
+            y=bin_depth,
+            colorscale='Cividis')  # Viridis, Inferno, Cividis, RdBu, Bluered_r, ["red", "green", "blue"]), [(0, "red"), (0.5, "green"), (1, "blue")]
+
+        # Create the Bottom Track Range Line
+        bt_line = go.Scatter(
+            x=bt_range['dt'],
+            y=bt_range['val']
+        )
+
+        plots = [heatmap, bt_line]
+
+        fig = go.Figure(data=plots)
 
         if self.is_upward_looking:
             fig.update_layout(
