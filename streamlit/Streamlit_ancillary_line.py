@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 import datetime
 from rti_python.Ensemble.Ensemble import Ensemble
+import sqlite3
 
 
 class StreamlitAncillaryLine:
@@ -93,6 +94,46 @@ class StreamlitAncillaryLine:
 
         # Create the figure
         #fig = go.Figure(data=plots)
+        fig_hpr = go.Figure()
+        fig_hpr.add_trace(line_heading)
+        fig_hpr.add_trace(line_pitch)
+        fig_hpr.add_trace(line_roll)
+
+        # Set the plot titles
+        fig_hpr.update_layout(
+            title=plot_title,
+            xaxis_title="DateTime",
+            yaxis_title="Degrees"
+        )
+
+        # Create a streamlit plot
+        st.plotly_chart(fig_hpr)
+
+    @staticmethod
+    def get_sqlite_plot(file_path: str):
+        # Get an SQLite connection
+        conn = sqlite3.connect(file_path)
+
+        # Query and get a dataframe result
+        df_hpr = pd.read_sql_query("SELECT dateTime, heading, pitch, roll from ensembles; ", conn)
+
+        # Close SQLite connection
+        conn.close()
+
+        plot_title = "Heading/Pitch/Roll"
+
+        # Create a Header
+        st.subheader(plot_title)
+
+        # Display a table of the data
+        st.write(df_hpr)
+
+        # Create line plots
+        line_heading = go.Scatter(x=df_hpr['dateTime'], y=df_hpr['heading'], mode='lines', name='Heading')
+        line_pitch = go.Scatter(x=df_hpr['dateTime'], y=df_hpr['pitch'], mode='lines', name='Pitch')
+        line_roll = go.Scatter(x=df_hpr['dateTime'], y=df_hpr['roll'], mode='lines', name='Roll')
+
+        # Create the figure
         fig_hpr = go.Figure()
         fig_hpr.add_trace(line_heading)
         fig_hpr.add_trace(line_pitch)

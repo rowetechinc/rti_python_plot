@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 import datetime
 from rti_python.Ensemble.Ensemble import Ensemble
+import sqlite3
 
 
 class StreamlitPowerLine:
@@ -77,3 +78,46 @@ class StreamlitPowerLine:
 
         # Create a streamlit plot
         st.plotly_chart(fig)
+
+    @staticmethod
+    def get_sqlite_plot(file_path: str):
+        # Get an SQLite connection
+        conn = sqlite3.connect(file_path)
+
+        # Query and get a dataframe result
+        df_volt = pd.read_sql_query("SELECT dateTime, Voltage from ensembles; ", conn)
+
+        # Close SQLite connection
+        conn.close()
+
+        # Load the data from the file
+        plot_title = "Voltage"
+
+        # Create a Header
+        st.subheader(plot_title)
+
+        # Display a table of the data
+        st.write(df_volt)
+
+        # Create the Voltage Line
+        line_plot = go.Scatter(
+            x=df_volt['dateTime'],
+            y=df_volt['Voltage']
+        )
+
+        # Combine all the plots
+        plots = [line_plot]
+
+        # Create the figure
+        fig = go.Figure(data=plots)
+
+        # Set the plot titles
+        fig.update_layout(
+            title=plot_title,
+            xaxis_title="DateTime",
+            yaxis_title="Volts"
+        )
+
+        # Create a streamlit plot
+        st.plotly_chart(fig)
+
