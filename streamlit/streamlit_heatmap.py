@@ -104,7 +104,7 @@ class StreamlitHeatmap:
         """
         return self.df_all_earth.loc[self.df_all_earth['type'] == "BT_Avg_Range"]
 
-    def get_plot(self, plot_type:str="mag"):
+    def get_plot(self, plot_type: str = "mag"):
         """
         Get the Plotly Magnitude Heatmap.
         :param plot_type: "mag" will plot magnitude data.  "dir" will plot direction data.
