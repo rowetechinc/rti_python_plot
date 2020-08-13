@@ -159,7 +159,8 @@ class PlotlyBottomTrackRangeLine:
         fig.update_layout(
             title=plot_title,
             xaxis_title="DateTime",
-            yaxis_title="Range (m)"
+            yaxis_title="Range (m)",
+            yaxis=dict(autorange='reversed'),
         )
 
         return fig, df_bt_range
