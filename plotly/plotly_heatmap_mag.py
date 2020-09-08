@@ -42,9 +42,6 @@ class PlotlyHeatmapMag:
         # Get an SQLite connection
         conn = sqlite3.connect(db_file_path)
 
-        # Query and get a dataframe result
-        df_volt = pd.read_sql_query("SELECT dateTime, Voltage from ensembles; ", conn)
-
         df_bt_range = pd.read_sql_query('SELECT ensembles.ensnum, ensembles.dateTime, ensembles.numbeams, ensembles.numbins, '
                                         'ensembles.binsize, ensembles.rangefirstbin, '
                                         'rangebeam0, rangebeam1, rangebeam2, rangebeam3, avgRange '
@@ -54,9 +51,9 @@ class PlotlyHeatmapMag:
                                         'ORDER BY ensembles.ensnum ASC;', conn)
 
         df_mag = pd.read_sql_query('SELECT ensembles.dateTime, ensembles.subsystemCode, ensembles.SubsystemConfig, '
-                                   'WpMagDir.bin, ensembles.rangeFirstBin, ensembles.binSize, ensembles.isUpwardLooking, WpMagDir.mag '
+                                   'earthMagDir.bin, ensembles.rangeFirstBin, ensembles.binSize, ensembles.isUpwardLooking, earthMagDir.mag '
                                    'FROM ensembles '
-                                   'INNER JOIN WpMagDir ON ensembles.id = WpMagDir.ensindex '
+                                   'INNER JOIN earthMagDir ON ensembles.id = earthMagDir.ensindex '
                                    'WHERE ensembles.project_id = 1 '
                                    'ORDER BY ensembles.dateTime ASC;', conn)
 
@@ -109,11 +106,6 @@ class PlotlyHeatmapMag:
         # Create a line at the bottom of the plot to connect to the bottom track line
         # Make the length of the list the same as the number of range values
         self.queue_bottom.extend([max(self.bin_depth_list)]*len(df_bt_range['avgRange'].tolist()))
-
-        # Convert the list of deque magnitudes to a list of magnitudes
-        #mag_list = []
-        #for mag_deque in self.list_mag:
-        #    mag_list.append(list(mag_deque))
 
         # Load the data from the file
         plot_title = "Water Magnitude"
