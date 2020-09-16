@@ -38,10 +38,10 @@ class PlotlyBottomTrackBeamVelocityLine:
         # Check if any of the values exceed the filter_max.
         # Use the absolute value to compare against
         if filter:
-            df_bt_range['beamVelBeam0'] = df_bt_range['beamVelBeam0'].apply(lambda x: x if abs(x) <= filter_max else None)
-            df_bt_range['beamVelBeam1'] = df_bt_range['beamVelBeam1'].apply(lambda x: x if abs(x) <= filter_max else None)
-            df_bt_range['beamVelBeam2'] = df_bt_range['beamVelBeam2'].apply(lambda x: x if abs(x) <= filter_max else None)
-            df_bt_range['beamVelBeam3'] = df_bt_range['beamVelBeam3'].apply(lambda x: x if abs(x) <= filter_max else None)
+            df_bt_range['beamVelBeam0'] = df_bt_range['beamVelBeam0'].apply(lambda x: x if x and abs(x) <= filter_max else None)
+            df_bt_range['beamVelBeam1'] = df_bt_range['beamVelBeam1'].apply(lambda x: x if x and abs(x) <= filter_max else None)
+            df_bt_range['beamVelBeam2'] = df_bt_range['beamVelBeam2'].apply(lambda x: x if x and abs(x) <= filter_max else None)
+            df_bt_range['beamVelBeam3'] = df_bt_range['beamVelBeam3'].apply(lambda x: x if x and abs(x) <= filter_max else None)
 
         # Load the data from the file
         if filter:
