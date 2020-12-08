@@ -46,7 +46,7 @@ class StreamlitStatusLine:
         fig, df_status = PlotlyStatusLine().get_sqlite_plot(db_file_path)
 
         # Load the data from the file
-        plot_title = "Voltage"
+        plot_title = "Status"
 
         # Create a Header
         st.subheader(plot_title)
